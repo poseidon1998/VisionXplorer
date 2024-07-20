@@ -1,0 +1,1 @@
+mysql -u cvxuser -h localhost -p Xplore@123 $1 < $2

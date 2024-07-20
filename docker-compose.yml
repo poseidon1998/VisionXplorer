@@ -1,0 +1,30 @@
+version: '3.4'
+
+services:
+  visionxplorer:
+    container_name: VisionXplorer
+    build: 
+      context: .
+      dockerfile: /store/code/test1/VisionXplorer/Dockerfile
+    ports:
+      - "${DOCKER_IP}:8100:8100"
+      - "${DOCKER_IP}:810:810"
+      # - "${DOCKER_IP}:9000:9000"
+      # - "${DOCKER_IP}:90:90"
+    volumes:
+      - /store/code/test1/VisionXplorer:/VisionXplorer
+    links:
+            - db
+  db: 
+    image: mysql:8.0
+    container_name: db
+    environment:
+        MYSQL_ROOT_PASSWORD: Xplore@123
+        MYSQL_DATABASE: CVX_V2
+        MYSQL_USER: cvxuser
+        MYSQL_PASSWORD: Xplore@123
+    ports:
+      - "${DOCKER_IP}:3306:3306"
+    restart: always
+    volumes:
+        - ./apps/mysql_data:/var/lib/mysql

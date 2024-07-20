@@ -1,0 +1,226 @@
+##
+# You should look at the following URL's in order to grasp a solid understanding
+# of Nginx configuration files in order to fully unleash the power of Nginx.
+# https://www.nginx.com/resources/wiki/start/
+# https://www.nginx.com/resources/wiki/start/topics/tutorials/config_pitfalls/
+# https://wiki.debian.org/Nginx/DirectoryStructure
+#
+# In most cases, administrators will remove this file from sites-enabled/ and
+# leave it as reference inside of sites-available where it will continue to be
+# updated by the nginx packaging team.
+#
+# This file will automatically load configuration files provided by other
+# applications, such as Drupal or Wordpress. These applications will be made
+# available underneath a path with that package name, such as /drupal8.
+#
+# Please see /usr/share/doc/nginx-doc/examples/ for more detailed examples.
+##
+
+# Default server configuration
+#
+server {
+        add_header Access-Control-Allow-Origin *;
+        
+        location /fcgi-bin/iipsrv.fcgi {
+                fastcgi_pass    localhost:9000;     
+                fastcgi_param   PATH_INFO $fastcgi_script_name;
+                fastcgi_param   REQUEST_METHOD $request_method;
+                fastcgi_param   QUERY_STRING $query_string;
+                fastcgi_param   CONTENT_TYPE $content_type;
+                fastcgi_param   CONTENT_LENGTH $content_length;
+                fastcgi_param   SERVER_PROTOCOL $server_protocol;
+                fastcgi_param   REQUEST_URI $request_uri;
+                fastcgi_param   HTTPS $https if_not_empty;
+        }
+        listen 80 default_server;
+        listen [::]:80 default_server;
+
+        root /var/www/html;
+
+        # Add index.php to the list if you are using PHP
+        index index.php index.html index.htm index.nginx-debian.html;
+
+        server_name _;
+
+        location /viewer {
+                alias  /apps/frontend/dist/;
+                try_files $uri $uri/ /viewer/index.html;
+        }
+        location /admin/ {
+                proxy_pass http://127.0.0.1:8000/admin/;
+                proxy_set_header Host $host;
+                proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+                proxy_set_header X-Forwarded-Proto $scheme;
+                proxy_redirect off;
+        }
+        location  /ohif/  {
+                        client_max_body_size 4096M;
+                        proxy_pass http://apollo1.humanbrain.in;
+                        proxy_set_header HOST $host;
+                        proxy_set_header X-Real-IP $remote_addr;
+                        rewrite /ohif(.*) $1 break;
+                        add_header 'Access-Control-Allow-Credentials' 'true';
+                        add_header 'Access-Control-Allow-Headers' 'DNT,X-CustomHeader,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type';
+                        add_header 'Access-Control-Allow-Methods' 'GET, POST, OPTIONS';
+                        add_header 'Access-Control-Allow-Origin' '*';
+        }
+        location  /orthanc/  {
+                        client_max_body_size 4096M;
+                        proxy_pass http://apollo2.humanbrain.in:8042;
+                        proxy_set_header HOST $host;
+                        proxy_set_header X-Real-IP $remote_addr;
+                        rewrite /orthanc(.*) $1 break;
+                        add_header 'Access-Control-Allow-Credentials' 'true';
+                        add_header 'Access-Control-Allow-Headers' 'DNT,X-CustomHeader,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type';
+                        add_header 'Access-Control-Allow-Methods' 'GET, POST, OPTIONS';
+                        add_header 'Access-Control-Allow-Origin' '*';
+        }
+        location /GW/ {
+                client_max_body_size 4096M;
+                proxy_pass http://127.0.0.1:8000/GW/;
+                proxy_set_header Host $host;
+                proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+                proxy_set_header X-Forwarded-Proto $scheme;
+                proxy_redirect off;
+        }
+        location /static/ {
+                proxy_pass http://127.0.0.1:8000/static/;
+                proxy_set_header Host $host;
+                proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+                proxy_set_header X-Forwarded-Proto $scheme;
+                proxy_redirect off;
+        }
+        location /BR/ {
+                proxy_pass http://127.0.0.1:8000/BR/;
+                proxy_set_header Host $host;
+                proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+                proxy_set_header X-Forwarded-Proto $scheme;
+                proxy_redirect off;
+        }
+        location /processing/ {
+                proxy_pass http://127.0.0.1:8000/processing/;
+                proxy_set_header Host $host;
+                proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+                proxy_set_header X-Forwarded-Proto $scheme;
+                proxy_redirect off;
+        }
+        location /qc/ {
+                proxy_pass http://127.0.0.1:8000/qc/;
+                proxy_set_header Host $host;
+                proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+                proxy_set_header X-Forwarded-Proto $scheme;
+                proxy_redirect off;
+        }
+        location /masterconfig/ {
+                proxy_pass http://127.0.0.1:8000/masterconfig/;
+                proxy_set_header Host $host;
+                proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+                proxy_set_header X-Forwarded-Proto $scheme;
+                proxy_redirect off;
+        }
+        location /lims/ {
+                proxy_pass http://127.0.0.1:8000/lims/;
+                proxy_set_header Host $host;
+                proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+                proxy_set_header X-Forwarded-Proto $scheme;
+                proxy_redirect off;
+        }
+        location /annotation/ {
+                proxy_pass http://127.0.0.1:8000/annotation/;
+                proxy_set_header Host $host;
+                proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+                proxy_set_header X-Forwarded-Proto $scheme;
+                proxy_redirect off;
+        }
+        location /CC/ {
+                proxy_pass http://127.0.0.1:8000/CC/;
+                proxy_set_header Host $host;
+                proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+                proxy_set_header X-Forwarded-Proto $scheme;
+                proxy_redirect off;
+        }
+        location /activities/ {
+                proxy_pass http://127.0.0.1:8000/activities/;
+                proxy_set_header Host $host;
+                proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+                proxy_set_header X-Forwarded-Proto $scheme;
+                proxy_redirect off;
+        }
+        location /jenkins/ {
+                proxy_pass http://apollo2.humanbrain.in:9011/;
+                proxy_set_header Host $host;
+                proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+                proxy_set_header X-Forwarded-Proto $scheme;
+                proxy_redirect off;
+        }
+        
+        location /iipsrv/ {
+                proxy_pass http://apollo2.humanbrain.in:9081/;
+                proxy_set_header Host $host;
+                proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+                proxy_set_header X-Forwarded-Proto $scheme;
+                proxy_redirect off;
+        }
+
+        location /ml/ {
+                proxy_pass http://dev1mohan.humanbrain.in:8888/;
+                proxy_set_header Host $host;
+                proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+                proxy_set_header X-Forwarded-Proto $scheme;
+                proxy_redirect off;
+        }
+
+        location /paraview {
+                proxy_pass http://dev1sam.humanbrain.in:81/index.html;
+                proxy_set_header Host $host;
+                proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+                proxy_set_header X-Forwarded-Proto $scheme;
+                proxy_redirect off;
+        }
+
+        location /Visualizer.js {
+                proxy_pass http://dev1sam.humanbrain.in:81/Visualizer.js;
+                proxy_set_header Host $host;
+                proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+                proxy_set_header X-Forwarded-Proto $scheme;
+                proxy_redirect off;
+        }
+
+        location /jiraTrigger/ {
+                proxy_pass http://127.0.0.1:90/jiraTrigger;
+                proxy_set_header Host $host;
+                proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+                proxy_set_header X-Forwarded-Proto $scheme;
+                proxy_redirect off;
+        }
+
+        location /imaging_service/ {
+                proxy_pass http://apollo2.humanbrain.in:9090/;
+                proxy_set_header Host $host;
+                proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+                proxy_set_header X-Forwarded-Proto $scheme;
+                proxy_redirect off;
+        }
+        
+        location / {
+                # First attempt to serve request as file, then
+                # as directory, then fall back to displaying a 404.
+                try_files $uri $uri/ =404;
+        }
+        location = / {
+                # First attempt to serve request as file, then
+                # as directory, then fall back to displaying a 404.                
+                rewrite ^/(.*)$ http://apollo2.humanbrain.in/viewer/ redirect;
+        }
+
+        location ~ \.php$ {
+                include snippets/fastcgi-php.conf;
+                fastcgi_pass unix:/var/run/php/php7.4-fpm.sock;
+        }
+
+        location ~ /\.ht {
+                deny all;
+        }
+
+}
+
